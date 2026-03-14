@@ -24,7 +24,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-EXPECTED_HEADERS = ("序号", "功能大类", "问题描述", "解决方法")
+HEADER_ALIASES: dict[str, tuple[str, ...]] = {
+    "序号": ("序号",),
+    "功能大类": ("功能大类", "功能分类", "业务大类"),
+    "问题描述": ("问题描述", "问题", "常见问题", "问题说明"),
+    "解决字段": ("解决方法", "解决办法", "处理办法", "处理方式", "解决方案"),
+}
 WHITESPACE_RE = re.compile(r"\s+")
 DELIMITER_RE = re.compile(r"[，,。；;：:、/\\|（）()\[\]【】《》<>\-—_]+")
 QUESTION_NOISE_RE = re.compile(
@@ -63,8 +68,8 @@ def normalize_header_name(header: Any) -> str:
 
 def build_header_mapping(columns: list[str]) -> dict[str, str]:
     """
-    根据 Excel 实际表头构建“标准表头 -> 实际列名”的映射。
-    若缺少关键表头则抛出异常。
+    根据 Excel 实际表头构建“标准字段 -> 实际列名”的映射。
+    支持表头别名，例如“解决方法 / 解决办法 / 解决方案”。
     """
     normalized_to_raw: dict[str, str] = {}
     for col in columns:
@@ -72,19 +77,25 @@ def build_header_mapping(columns: list[str]) -> dict[str, str]:
 
     mapping: dict[str, str] = {}
     missing: list[str] = []
-    for expected in EXPECTED_HEADERS:
-        key = normalize_header_name(expected)
-        raw = normalized_to_raw.get(key)
-        if raw is None:
-            missing.append(expected)
+
+    for standard_name, aliases in HEADER_ALIASES.items():
+        matched_raw: str | None = None
+        for alias in aliases:
+            alias_key = normalize_header_name(alias)
+            raw = normalized_to_raw.get(alias_key)
+            if raw is not None:
+                matched_raw = raw
+                break
+
+        if matched_raw is None:
+            missing.append(f"{standard_name} <- {list(aliases)}")
         else:
-            mapping[expected] = raw
+            mapping[standard_name] = matched_raw
 
     if missing:
         raise ValueError(
-            f"Excel 缺少必要表头: {missing}。"
+            f"Excel 缺少必要表头映射: {missing}。"
             f"实际表头为: {columns}。"
-            f"请确保包含：{list(EXPECTED_HEADERS)}"
         )
 
     return mapping
@@ -262,6 +273,7 @@ def read_excel_faq(input_path: Path, sheet_name: str | int | None = 0) -> pd.Dat
 
     # 统一清理列名显示形式
     df.columns = [normalize_text(col) for col in df.columns]
+    logger.info("Excel 识别到的表头：%s", list(df.columns))
     return df
 
 
@@ -275,7 +287,7 @@ def parse_excel_faq(input_path: Path, sheet_name: str | int | None = 0) -> list[
     seq_col = header_mapping["序号"]
     category_col = header_mapping["功能大类"]
     question_col = header_mapping["问题描述"]
-    answer_col = header_mapping["解决方法"]
+    answer_col = header_mapping["解决字段"]
 
     chunks: list[KBChunk] = []
     skipped_count = 0

@@ -1,0 +1,5 @@
+2026-03-14 22:53:37 | INFO | app.logging_utils | 日志系统已初始化，日志文件路径：C:\Users\admin\Documents\我的文档\Codes\Python-daily-practice\260306_网银RAG聊天机器人\logs\parse_excel_faq-20260314-225337.log
+2026-03-14 22:53:37 | INFO | __main__ | 开始解析 Excel FAQ：input=C:\Users\admin\Documents\我的文档\Codes\Python-daily-practice\260306_网银RAG聊天机器人\data\raw\企业网银常见问题.xlsx, output=C:\Users\admin\Documents\我的文档\Codes\Python-daily-practice\260306_网银RAG聊天机器人\data\parsed\excel_kb.jsonl, sheet=0
+2026-03-14 22:53:38 | INFO | __main__ | Excel 识别到的表头：['序号', '功能大类', '问题描述', '解决办法']
+2026-03-14 22:53:38 | INFO | __main__ | Excel 解析完成：总行数=70，成功=70，跳过=0，文件=C:\Users\admin\Documents\我的文档\Codes\Python-daily-practice\260306_网银RAG聊天机器人\data\raw\企业网银常见问题.xlsx
+2026-03-14 22:53:38 | INFO | __main__ | JSONL 已保存：C:\Users\admin\Documents\我的文档\Codes\Python-daily-practice\260306_网银RAG聊天机器人\data\parsed\excel_kb.jsonl（共 70 条）
