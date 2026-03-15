@@ -631,8 +631,9 @@ def make_chroma_metadata(chunk: KBChunk) -> dict[str, Any]:
         "source_type": chunk.source_type,
         "title": chunk.title,
         "priority": float(chunk.priority),
-        "image_paths": chunk.image_paths,
-        "keywords": chunk.keywords,
+        "has_image": bool(chunk.image_paths),
+        # "image_paths": chunk.image_paths,
+        # "keywords": chunk.keywords,
     }
 
     if chunk.category is not None:
@@ -641,7 +642,11 @@ def make_chroma_metadata(chunk: KBChunk) -> dict[str, Any]:
         metadata["slide_no"] = int(chunk.slide_no)
     if chunk.page_no is not None:
         metadata["page_no"] = int(chunk.page_no)
-
+    # 只在非空时写入列表字段
+    if chunk.image_paths:
+        metadata["image_paths_json"] = json.dumps(chunk.image_paths, ensure_ascii=False)
+    if chunk.keywords:
+        metadata["keywords_text"] = " | ".join(chunk.keywords)
     return metadata
 
 

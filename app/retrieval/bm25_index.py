@@ -13,7 +13,9 @@ from rank_bm25 import BM25Okapi
 
 from app.config import get_settings
 from app.retrieval.query_normalizer import normalize_query
+from app.logging_utils import setup_logging
 
+setup_logging(level="INFO", module_name=__name__)
 logger = logging.getLogger(__name__)
 
 WHITESPACE_RE = re.compile(r"\s+")
@@ -152,10 +154,10 @@ def _tokenize_for_bm25(text: str) -> list[str]:
             tokens.append(span)
 
         if len(span) >= 2:
-            tokens.extend(span[i : i + 2] for i in range(len(span) - 1))
+            tokens.extend(span[i: i + 2] for i in range(len(span) - 1))
 
         if len(span) >= 3:
-            tokens.extend(span[i : i + 3] for i in range(len(span) - 2))
+            tokens.extend(span[i: i + 3] for i in range(len(span) - 2))
 
     for part in PUNCT_SPLIT_RE.split(normalized):
         part = _normalize_text(part)
@@ -218,7 +220,7 @@ def _make_searchable_text(doc: BM25Document) -> str:
         doc.category or "",
         doc.bm25_text,
         " ".join(doc.tokens),
-        ]
+    ]
     return " | ".join(part for part in (_normalize_text(p) for p in parts) if part).casefold()
 
 
