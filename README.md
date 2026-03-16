@@ -3,10 +3,6 @@
 
 #### EviBank-RAG: Evidence-Grounded Retrieval-Augmented QA System for Enterprise E-Banking
 
-> 一个面向**企业网银交易常见问题**场景的轻量级 RAG 问答机器人 Demo。  
-> 项目聚焦“**本地可运行、易于演示、证据可追溯、图文可展示**”的工程目标，适用于企业内部知识问答、业务 FAQ 辅助检索与会议演示场景。
->
-> Built a lightweight evidence-grounded RAG system for enterprise e-banking FAQ, featuring multi-source knowledge ingestion, hybrid retrieval, source-aware reranking, and explainable answer generation with visual evidence presentation.
 
 <p align="center">
   <img alt="Python" src="https://img.shields.io/badge/Python-3.12+-blue.svg">
@@ -17,6 +13,10 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-lightgrey.svg">
 </p>
 
+> 一个面向**企业网银交易常见问题**场景的轻量级 RAG 问答机器人 Demo。  
+> 项目聚焦“**本地可运行、易于演示、证据可追溯、图文可展示**”的工程目标，适用于企业内部知识问答、业务 FAQ 辅助检索与会议演示场景。
+>
+> Built a lightweight evidence-grounded RAG system for enterprise e-banking FAQ, featuring multi-source knowledge ingestion, hybrid retrieval, source-aware reranking, and explainable answer generation with visual evidence presentation.
 
 
 ---
