@@ -12,7 +12,9 @@ import pandas as pd
 from app.config import get_settings
 from app.models import ChatAnswer, EvidenceItem
 from app.services.chat_service import ChatService
+from app.logging_utils import setup_logging
 
+setup_logging(level="INFO", module_name=__name__)
 logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -228,7 +230,7 @@ def _build_evidence_dataframe(answer: ChatAnswer) -> pd.DataFrame:
                 _format_location(item),
                 round(_safe_float(item.score, 0.0), 6),
                 _normalize_text(item.reason),
-                ]
+            ]
         )
 
     if not rows:
@@ -550,7 +552,7 @@ def build_demo() -> gr.Blocks:
                     with gr.Group():
                         for i in range(0, len(example_questions), 2):
                             with gr.Row():
-                                for example in example_questions[i : i + 2]:
+                                for example in example_questions[i: i + 2]:
                                     example_btn = gr.Button(
                                         value=example,
                                         variant="secondary",
@@ -583,9 +585,7 @@ def build_demo() -> gr.Blocks:
                         datatype=["str", "str", "str", "str", "str", "str", "number", "str"],
                         interactive=False,
                         wrap=True,
-                        row_count=(0, "dynamic"),
-                        col_count=(len(EVIDENCE_TABLE_COLUMNS), "fixed"),
-                        height=260,
+                        max_height=260,
                         label="命中证据",
                     )
 
@@ -639,7 +639,6 @@ def build_demo() -> gr.Blocks:
 
 
 demo = build_demo()
-
 
 if __name__ == "__main__":
     demo.launch()

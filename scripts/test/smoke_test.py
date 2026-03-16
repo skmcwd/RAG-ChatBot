@@ -265,7 +265,7 @@ def main() -> int:
     主入口。
     """
     args = parse_args()
-    setup_logging(args.log_level)
+    setup_logging(args.log_level, module_name="__main__")
 
     print(SEPARATOR)
     print("企业网银 FAQ RAG demo 最小冒烟测试")

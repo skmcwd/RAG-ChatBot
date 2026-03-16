@@ -5,7 +5,7 @@ import traceback
 
 from app.retrieval.bm25_index import BM25Index
 
-BM25_DIR = Path("../data/index/bm25")
+BM25_DIR = Path("../../data/index/bm25")
 
 TEST_QUERIES = [
     "代发工资失败了在哪里看",

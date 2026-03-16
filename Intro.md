@@ -1,5 +1,17 @@
 # 详细介绍
-
+> 在运行该项目前，先在根目录下加入`.env`文件
+```dotenv
+# 阿里云百炼 API Key，用于调用 OpenAI 兼容接口,不能公开
+DASHSCOPE_API_KEY=(填入你的API KEY)
+# 阿里云百炼 OpenAI 兼容接口基地址
+DASHSCOPE_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+# 默认大语言模型名称，用于问答生成
+LLM_MODEL=qwen3.5-flash
+# 默认向量化模型名称，用于文档检索嵌入
+EMBED_MODEL=text-embedding-v4
+# 应用运行环境，例如 development / test / production
+APP_ENV=development
+```
 ## 1.1 运行时架构
 
 最终交付的程序，做这几件事：

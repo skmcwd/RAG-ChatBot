@@ -12,7 +12,7 @@ from app.logging_utils import setup_logging
 from app.services.chat_service import ChatService
 import app.ui.app as ui_app_module
 
-# setup_logging(level="INFO", module_name=__name__)
+setup_logging(level="INFO", module_name=__name__)
 logger = logging.getLogger(__name__)
 
 DEFAULT_HOST = "127.0.0.1"

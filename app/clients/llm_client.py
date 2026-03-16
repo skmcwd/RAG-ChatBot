@@ -22,7 +22,9 @@ from tenacity import (
 )
 
 from app.config import get_settings
+from app.logging_utils import setup_logging
 
+setup_logging(level="INFO", module_name=__name__)
 logger = logging.getLogger(__name__)
 
 _DEFAULT_MODEL = "qwen3.5-flash"
