@@ -1,0 +1,41 @@
+retrieval:
+  vector_top_k: 20
+  bm25_top_k: 20
+  final_context_k: 6
+
+rerank:
+  vector_weight: 0.55
+  bm25_weight: 0.45
+  exact_match_boost: 0.2
+  category_boost: 0.15
+  priority_boost: 0.1
+
+ui:
+  app_title: "企业网银 FAQ RAG Demo"
+  app_subtitle: "基于阿里云百炼 OpenAI 兼容接口的企业网银智能问答演示"
+  example_questions:
+    - "客户代发工具转换有问题怎么办？"
+    - "客户证书过期了怎么更新？"
+    - "客户反复安装了控件、驱动，还是识别不到UK怎么办？"
+    - "代发工资结果查询方式？"
+    - "企业网银限额在哪里看？"
+    - "怎么向保证金账户转账？"
+paths:
+  share: True
+
+source_priority:
+  excel: 1.0
+  ppt: 0.95
+  docx: 1.1
+
+categories:
+  - "代发"
+  - "证书"
+  - "UKey"
+  - "登录"
+  - "权限"
+  - "回单"
+  - "转账"
+  - "控件"
+  - "账号权限"
+  - "查询"

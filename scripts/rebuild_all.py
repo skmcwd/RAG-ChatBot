@@ -17,12 +17,20 @@ from typing import Any, Callable, Iterable
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-
+from scripts import parse_excel_faq as excel_parser_module  # noqa: E402
+from scripts import parse_ppt_kb as ppt_parser_module  # noqa: E402
+from scripts import parse_docx_manual as docx_parser_module  # noqa: E402
+from scripts import build_indexes as build_indexes_module
 from app.config import get_settings  # noqa: E402
 from app.logging_utils import setup_logging  # noqa: E402
 from app.models import KBChunk  # noqa: E402
 from app.runtime import get_runtime_root  # noqa: E402
-
+PARSER_MODULES = {
+    "excel": excel_parser_module,
+    "ppt": ppt_parser_module,
+    "docx": docx_parser_module,
+}
+BUILD_INDEXES_MODULE = build_indexes_module
 logger = logging.getLogger(__name__)
 
 SUPPORTED_EXCEL_SUFFIXES = {".xlsx", ".xls", ".xlsm"}
@@ -369,7 +377,7 @@ def _coerce_to_kbchunk(
 
 def _parse_with_module(
         *,
-        module_name: str,
+        module: Any,
         source_type: str,
         input_path: Path,
         output_path: Path,
@@ -385,8 +393,7 @@ def _parse_with_module(
     logger.info("开始解析 %s 文件：%s", source_type, input_path)
 
     try:
-        module = _import_module(module_name)
-
+        module_name = getattr(module, "__name__", str(module))
         parse_func = _get_first_callable(module, parse_candidates)
 
         # # 常见保存函数名
@@ -488,7 +495,8 @@ def parse_all_sources(paths: RuntimePaths, discovered: DiscoveredFiles) -> list[
         output_name = _short_stable_name(file_path, paths.raw_dir) + ".jsonl"
         results.append(
             _parse_with_module(
-                module_name="scripts.parse_excel_faq",
+                # module_name="scripts.parse_excel_faq",
+                module=PARSER_MODULES["excel"],
                 source_type="excel",
                 input_path=file_path,
                 output_path=excel_out_dir / output_name,
@@ -504,7 +512,8 @@ def parse_all_sources(paths: RuntimePaths, discovered: DiscoveredFiles) -> list[
         output_name = _short_stable_name(file_path, paths.raw_dir) + ".jsonl"
         results.append(
             _parse_with_module(
-                module_name="scripts.parse_ppt_kb",
+                # module_name="scripts.parse_ppt_kb",
+                module=PARSER_MODULES["ppt"],
                 source_type="ppt",
                 input_path=file_path,
                 output_path=ppt_out_dir / output_name,
@@ -520,7 +529,8 @@ def parse_all_sources(paths: RuntimePaths, discovered: DiscoveredFiles) -> list[
         output_name = _short_stable_name(file_path, paths.raw_dir) + ".jsonl"
         results.append(
             _parse_with_module(
-                module_name="scripts.parse_docx_manual",
+                # module_name="scripts.parse_docx_manual",
+                module=PARSER_MODULES["docx"],
                 source_type="docx",
                 input_path=file_path,
                 output_path=docx_out_dir / output_name,
@@ -586,6 +596,44 @@ def _patched_argv(argv: list[str]):
         sys.argv = old_argv
 
 
+# def rebuild_indexes(
+#         kb_jsonl_path: Path,
+#         *,
+#         batch_size: int,
+#         collection_name: str | None,
+#         log_level: str,
+# ) -> int:
+#     """
+#     直接复用 scripts.build_indexes.py 的 CLI 入口，避免重复实现索引逻辑。
+#     """
+#     module = _import_module("scripts.build_indexes")
+#     main_func = getattr(module, "main", None)
+#     if not callable(main_func):
+#         raise RebuildAllError("scripts.build_indexes 中不存在可调用的 main()。")
+#
+#     argv = [
+#         "build_indexes.py",
+#         "--input",
+#         str(kb_jsonl_path),
+#         "--rebuild",
+#         "--batch-size",
+#         str(batch_size),
+#         "--log-level",
+#         log_level,
+#     ]
+#     if collection_name:
+#         argv.extend(["--collection-name", collection_name])
+#
+#     logger.info("开始重建索引：argv=%s", argv)
+#
+#     with _patched_argv(argv):
+#         return_code = int(main_func())
+#
+#     if return_code != 0:
+#         raise RebuildAllError(f"build_indexes.py 执行失败，返回码={return_code}")
+#
+#     logger.info("索引重建完成。")
+#     return return_code
 def rebuild_indexes(
         kb_jsonl_path: Path,
         *,
@@ -595,11 +643,14 @@ def rebuild_indexes(
 ) -> int:
     """
     直接复用 scripts.build_indexes.py 的 CLI 入口，避免重复实现索引逻辑。
+    这里使用静态导入的模块对象，避免打包后动态导入 scripts.build_indexes 失败。
     """
-    module = _import_module("scripts.build_indexes")
+    module = BUILD_INDEXES_MODULE
+    module_name = getattr(module, "__name__", "scripts.build_indexes")
+
     main_func = getattr(module, "main", None)
     if not callable(main_func):
-        raise RebuildAllError("scripts.build_indexes 中不存在可调用的 main()。")
+        raise RebuildAllError(f"{module_name} 中不存在可调用的 main()。")
 
     argv = [
         "build_indexes.py",
@@ -624,7 +675,6 @@ def rebuild_indexes(
 
     logger.info("索引重建完成。")
     return return_code
-
 
 def write_summary(
         *,
